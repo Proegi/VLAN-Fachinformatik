@@ -234,6 +234,55 @@
   .reveal table.grid{margin:0;max-width:100%;background:#fff}
   .foot{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 
+  .selfcheck{display:inline-flex;gap:9px;align-items:center;font-size:14px;color:var(--muted);cursor:pointer;margin-top:2px}
+  .selfcheck input{width:18px;height:18px;margin:0;accent-color:var(--ok)}
+
+  .checklist{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:16px 20px 18px;margin-top:22px}
+  .checklist h2{margin:0 0 4px}
+  .cl-count{margin:0 0 10px;font-size:14px;color:var(--muted)}
+  .checklist ul{list-style:none;margin:0 0 14px;padding:0}
+  .checklist li{display:flex;gap:12px;align-items:center;padding:7px 0;border-top:1px solid #e3e8ea;font-size:14.5px;color:var(--muted)}
+  .cl-box{width:20px;height:20px;border:1.5px solid #9aa5ab;border-radius:3px;display:grid;place-items:center;flex:0 0 auto;color:#fff;font-size:13px;line-height:1}
+  .cl-num{font-family:var(--mono);font-size:12.5px;width:72px;flex:0 0 auto}
+  .checklist li.done{color:var(--ink)}
+  .checklist li.done .cl-box{background:var(--ok);border-color:var(--ok)}
+  .checklist li.done .cl-box::after{content:"\2713"}
+  .cl-bar{height:6px;background:#e3e8ea;border-radius:3px;overflow:hidden;margin:0 0 12px}
+  .cl-bar i{display:block;height:100%;width:0;background:var(--ok)}
+
+  .printonly{display:none}
+  .printhead{display:none}
+
+  @media print{
+    @page{margin:14mm 14mm 16mm}
+    html,body{background:#fff}
+    body{padding:0;font-size:11pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .wrap{max-width:none}
+    h1{font-size:20pt}
+    .lede{color:#333;margin-bottom:14px}
+    .noprint,#stepStart,button,.guess,.vt-tools,.foot,#groups{display:none!important}
+    #afterLogin{display:block!important}
+    .printonly,.printhead{display:block}
+    .printhead{font-size:9.5pt;color:#555;border-bottom:1px solid #999;padding-bottom:4px;margin-bottom:12px}
+    section{margin-bottom:18px}
+    h2{font-size:13pt;margin:0 0 8px;break-after:avoid}
+    ol.tasks li{break-inside:avoid;border-color:#999;padding:9px 12px;margin-bottom:7px}
+    ol.tasks li::before{background:#000}
+    ol.tasks p{font-size:10.5pt;max-width:none}
+    .cloze{background:#fff;border-color:#999;line-height:1.9;max-width:none}
+    .cloze select,.inline select{-webkit-appearance:none;appearance:none;border:0;border-bottom:1px solid #000;border-radius:0;font-weight:600;background:none;padding:0 3px;min-width:0;width:auto}
+    .followup{border-top-color:#999}
+    .fb.show,.reveal.show{break-inside:avoid}
+    .reveal{background:#f3f3f3;border-left-color:#666;max-width:none}
+    table.grid{max-width:none}
+    table.grid th{background:#262b2f!important;color:#fff!important}
+    .checklist{break-inside:avoid;border-color:#999;margin-top:0}
+    .checklist li{padding:4px 0}
+    .selfcheck{color:#000}
+    .psum table.grid td{font-size:9.5pt}
+    .psum ul{margin:0;padding-left:18px;font-size:10pt;columns:2}
+  }
+
   @media (max-width:820px){ .ports{grid-template-columns:repeat(2,1fr)} }
   @media (max-width:460px){
     .ports{grid-template-columns:1fr}
@@ -248,6 +297,7 @@
 <body>
 <div class="wrap">
 
+  <div class="printhead">BS-FI, Lernfeld 3 · VLAN am Switch · Ausdruck vom <span id="printDate"></span></div>
   <h1>VLAN am Switch</h1>
   <p class="lede">In einem kleinen Betrieb hängen Geräte an einem Switch mit sechzehn Ports. Alle liegen im Netz 192.168.1.0 mit der Subnetzmaske 255.255.255.0. Deine Aufgabe ist es, den Datenverkehr zwischen den Bereichen zu ordnen.</p>
 
@@ -259,7 +309,7 @@
     </div>
   </section>
 
-  <section>
+  <section class="noprint">
     <div class="browser">
       <div class="bar">
         <div class="dots"><i></i><i></i><i></i></div>
@@ -316,7 +366,7 @@
 
   <div id="afterLogin" class="hidden">
 
-    <section>
+    <section class="noprint">
       <h2>Verbindung testen</h2>
       <div class="panel">
         <p class="intro">Die Weboberfläche zeigt nur Ports, Status und gelernte MAC-Adressen. Ein Switch kennt die IP-Adressen der angeschlossenen Geräte nicht. Welches Gerät welche MAC-Adresse und welche IP hat, steht in der Netzwerkdokumentation. Mit dem Befehl <code>ping</code> prüfst du, ob ein Gerät ein anderes erreicht, zum Beispiel <code>ping 192.168.1.11</code>.</p>
@@ -383,6 +433,7 @@
             <h3>Die Portbelegung ermitteln</h3>
             <p>Die Netzwerkdokumentation ist unsortiert und enthält keine Portangaben. Das einzige gemeinsame Merkmal zwischen Dokumentation und Weboberfläche ist die MAC-Adresse.</p>
             <p>Lege eine eigene Tabelle an, in der du die Geräte nach Portnummer sortierst. Notiere zu jedem Port das Gerät, die IP-Adresse und die MAC-Adresse. An zwei Ports wirst du mehrere Geräte finden. Halte fest, welche das sind, und überlege, was das bedeutet.</p>
+            <label class="selfcheck"><input type="checkbox" id="done2"> Meine Tabelle ist fertig</label>
           </div>
         </li>
 
@@ -489,7 +540,17 @@
         <button id="toggleGroups" aria-pressed="false">Gruppen anzeigen</button>
       </div>
       <div class="reveal" id="groups"></div>
+
+      <div class="checklist">
+        <h2>Checkliste</h2>
+        <p class="cl-count" id="clCount"></p>
+        <div class="cl-bar"><i id="clBar"></i></div>
+        <ul id="clList"></ul>
+        <button class="primary js-print">PDF speichern</button>
+      </div>
     </section>
+
+    <section class="printonly psum" id="printSummary"></section>
 
   </div>
 </div>
@@ -911,6 +972,7 @@
     var el = $("fb" + id);
     el.className = "fb show " + (ok ? "ok" : "no");
     el.textContent = msg;
+    if(ok && String(id) !== "7"){ markDone(String(id) === "7b" ? "7" : String(id)); }
   }
   function clearFeedback(){
     ["fb3","fb4","fb5","fb6","fb7","fb8","fb9"].forEach(function(id){ $(id).className = "fb"; });
@@ -983,6 +1045,7 @@
         say(6,false,"Mit den VLAN-Einstellungen allein ist diese Aufgabe nicht lösbar.");
         rev6.className = "reveal show";
         rev6.textContent = "Ein Access-Port gehört immer zu genau einem VLAN. Der Server kann also entweder im Büro-VLAN oder im Werkstatt-VLAN liegen, nicht in beiden. Ein Switch trennt auf Schicht 2 und kann diese Trennung nicht selbst überbrücken. Damit beide Bereiche den Server erreichen, braucht es ein Gerät auf Schicht 3, also einen Router oder einen Layer-3-Switch. Eine andere Möglichkeit wäre eine zweite Netzwerkkarte im Server, sodass er in beiden VLANs je einen eigenen Anschluss hat.";
+        markDone("6");
       }
 
       if(n === "7"){
@@ -1072,9 +1135,120 @@
     updateSend();
   });
 
+  /* ================= Checkliste ================= */
+  var DONE_PREFIX = "bsfi-vlan:done:";
+  var done = {};
+  var clItems = [];
+
+  function markDone(n){
+    if(done[n]) return;
+    done[n] = true;
+    try{ localStorage.setItem(DONE_PREFIX + n, "1"); }catch(e){}
+    renderChecklist();
+  }
+
+  function itemDone(it){
+    if(it.manual) return it.manual.checked;
+    if(it.fields.length){
+      return it.fields.some(function(f){
+        var v = f.isContentEditable ? f.textContent : f.value;
+        return v && v.trim() !== "";
+      });
+    }
+    return !!done[it.n];
+  }
+
+  function buildChecklist(){
+    document.querySelectorAll("ol.tasks > li").forEach(function(li, i){
+      var n = String(i + 1);
+      try{ if(localStorage.getItem(DONE_PREFIX + n) === "1") done[n] = true; }catch(e){}
+      clItems.push({
+        n: n,
+        title: li.querySelector("h3").textContent,
+        manual: li.querySelector(".selfcheck input"),
+        fields: li.querySelector("[data-check]") ? [] :
+          Array.prototype.slice.call(li.querySelectorAll('[contenteditable="true"], textarea, input[type="text"]'))
+      });
+    });
+    renderChecklist();
+  }
+
+  function renderChecklist(){
+    var list = $("clList"), fertig = 0;
+    list.innerHTML = "";
+    clItems.forEach(function(it){
+      var ok = itemDone(it);
+      if(ok) fertig++;
+      var li = document.createElement("li");
+      li.className = ok ? "done" : "";
+      li.innerHTML = '<span class="cl-box"></span><span class="cl-num">Aufgabe ' + it.n + '</span><span></span>';
+      li.lastChild.textContent = it.title;
+      list.appendChild(li);
+    });
+    $("clCount").textContent = fertig + " von " + clItems.length + " Aufgaben erledigt";
+    $("clBar").style.width = (clItems.length ? fertig / clItems.length * 100 : 0) + "%";
+  }
+  document.addEventListener("input", renderChecklist);
+  document.addEventListener("change", renderChecklist);
+
+  /* ================= Druckansicht ================= */
+  function buildPrintSummary(){
+    var d = new Date();
+    $("printDate").textContent = d.toLocaleDateString("de-DE");
+    var box = $("printSummary");
+    box.innerHTML = "";
+
+    var h = document.createElement("h2");
+    h.textContent = "Deine Switch-Konfiguration";
+    box.appendChild(h);
+    var t = document.createElement("table");
+    t.className = "grid";
+    t.innerHTML = "<tr><th>Port</th><th>Gelernte MAC-Adressen</th><th>Einstellung</th></tr>";
+    PORTS.forEach(function(p){
+      var macs = macsOf(p);
+      var tr = document.createElement("tr");
+      [ "Port " + p,
+        macs.length ? macs.join(", ") : "nicht verbunden",
+        state[p] === "trunk" ? "Trunk (alle VLANs)" : "VLAN " + state[p]
+      ].forEach(function(txt, i){
+        var td = document.createElement("td");
+        td.textContent = txt;
+        if(i === 1) td.className = "m";
+        tr.appendChild(td);
+      });
+      t.appendChild(tr);
+    });
+    box.appendChild(t);
+
+    var h2 = document.createElement("h2");
+    h2.textContent = "Deine Tests";
+    box.appendChild(h2);
+    if(!log.length){
+      var p0 = document.createElement("p");
+      p0.textContent = "In dieser Sitzung wurden keine Pings gesendet.";
+      box.appendChild(p0);
+    }else{
+      var ul = document.createElement("ul");
+      log.forEach(function(e){
+        var li = document.createElement("li");
+        li.textContent = "Port " + e.a + " an " + e.ip + ": " + (e.reachable ? "erreichbar" : "nicht erreichbar");
+        ul.appendChild(li);
+      });
+      box.appendChild(ul);
+    }
+  }
+  window.addEventListener("beforeprint", buildPrintSummary);
+  document.addEventListener("click", function(e){
+    if(e.target.closest && e.target.closest(".js-print")){
+      buildPrintSummary();
+      window.print();
+    }
+  });
+
   buildPorts();
   buildSource();
   updateSend();
+  buildChecklist();
   elUrl.focus();
 })();
 </script>
@@ -1085,7 +1259,7 @@
 .vt-tools button:hover{background:rgba(128,128,128,.16)}
 @media print{.vt-tools{display:none}}
 </style>
-<div class="vt-tools"><button type="button" id="vt-wipe">Alle Eingaben löschen</button></div>
+<div class="vt-tools"><button type="button" class="js-print">PDF speichern</button> <button type="button" id="vt-wipe">Alle Eingaben löschen</button></div>
 <script>
 (function(){
   var PREFIX = 'bsfi-vlan:';
