@@ -153,6 +153,16 @@
   }
   .maclist span{display:block}
 
+  .allowed{margin-top:8px;padding:8px 9px;background:#fff;border:1px solid var(--line);border-radius:3px}
+  .allowed .al-head{font-size:12px;color:var(--muted);margin:0 0 5px}
+  .allowed .al-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px 6px}
+  .allowed label{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:11.5px;cursor:pointer}
+  .allowed input{width:14px;height:14px;margin:0;accent-color:var(--ink)}
+  .allowed .sw{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+  .allowed .al-store{display:none}
+
+  .topreset{margin:0 0 12px}
+
   select,input[type="text"],input[type="password"],input[type="number"]{
     width:100%;font-family:inherit;font-size:14px;padding:6px 8px;
     border:1px solid var(--line);border-radius:3px;background:#fff;color:var(--ink);
@@ -397,6 +407,9 @@
 
     <section>
       <h2>Aufgaben</h2>
+      <div class="foot topreset">
+        <button id="resetTop">Alle Ports auf VLAN 1</button>
+      </div>
       <ol class="tasks">
 
         <li>
@@ -432,7 +445,7 @@
           <div>
             <h3>Die Portbelegung ermitteln</h3>
             <p>Die Netzwerkdokumentation ist unsortiert und enthält keine Portangaben. Das einzige gemeinsame Merkmal zwischen Dokumentation und Weboberfläche ist die MAC-Adresse.</p>
-            <p>Lege eine eigene Tabelle an, in der du die Geräte nach Portnummer sortierst. Notiere zu jedem Port das Gerät, die IP-Adresse und die MAC-Adresse. An zwei Ports wirst du mehrere Geräte finden. Halte fest, welche das sind, und überlege, was das bedeutet.</p>
+            <p>Lege eine eigene Tabelle an, in der du die Geräte nach Portnummer sortierst. Notiere zu jedem Port das Gerät, die IP-Adresse und die MAC-Adresse. An mehreren Ports wirst du mehrere Geräte finden. Halte fest, welche das sind, und überlege, was das bedeutet.</p>
             <label class="selfcheck"><input type="checkbox" id="done2"> Meine Tabelle ist fertig</label>
           </div>
         </li>
@@ -517,7 +530,7 @@
         <li>
           <div>
             <h3>Den Uplink einrichten</h3>
-            <p>An Port 9 hängt bereits ein Kabel zum Switch im Nachbarraum. Stelle diesen Port so ein, dass alle drei VLANs über diese eine Leitung laufen. Stelle die drei Ports aus der vorherigen Aufgabe wieder auf VLAN 1 zurück. Weise das Ergebnis durch Pings nach: eine Verbindung vom Büro zu einem Bürogerät im Nachbarraum und eine von der Werkstatt zu einem Werkstattgerät im Nachbarraum.</p>
+            <p>An Port 9 hängt bereits ein Kabel zum Switch im Nachbarraum. Stelle diesen Port so ein, dass alle drei VLANs über diese eine Leitung laufen. Bei einem Trunk-Port legst du unter dem Auswahlfeld fest, welche VLANs er übertragen darf. Stelle die drei Ports aus der vorherigen Aufgabe wieder auf VLAN 1 zurück. Weise das Ergebnis durch Pings nach: eine Verbindung vom Büro zu einem Bürogerät im Nachbarraum und eine von der Werkstatt zu einem Werkstattgerät im Nachbarraum.</p>
             <button data-check="8">Prüfen</button>
             <div class="fb" id="fb8"></div>
             <div class="reveal" id="rev8"></div>
@@ -526,11 +539,54 @@
 
         <li>
           <div>
-            <h3>Der Empfang</h3>
-            <p>An Port 10 hängt ein einfacher Switch ohne Verwaltung. Die drei Geräte am Empfang sollen ins Büro-VLAN. Richte das ein und prüfe es mit einem Test. Stelle Port 10 anschließend versuchsweise auf Trunk und teste erneut. Was passiert und warum?</p>
+            <h3>Ein Trunk kommt an</h3>
+            <p>An Port 14 wurde ein neuer verwalteter Switch aus dem Obergeschoss angeschlossen. Dessen Anschluss zu uns ist dort bereits als Trunk eingerichtet und überträgt VLAN 10 und VLAN 20.</p>
+            <p>Ein Port, der auf genau ein VLAN eingestellt ist, heißt <b>Access-Port</b>. So hast du bisher alle Ports für Endgeräte eingerichtet.</p>
+            <p>Stelle Port 14 zuerst als Access-Port auf VLAN 10 und teste vom Büro aus den PC Büro OG (192.168.1.61). Richte Port 14 danach so ein, dass Büro und Werkstatt das Obergeschoss erreichen, und weise das mit je einem Ping nach.</p>
             <button data-check="9">Prüfen</button>
             <div class="fb" id="fb9"></div>
-            <div class="reveal" id="rev9"></div>
+
+            <div class="followup" id="follow9">
+              <p>Im Obergeschoss steht auch ein Gast-Laptop in VLAN 30 (192.168.1.63). Was passiert, wenn du an Port 14 zusätzlich VLAN 30 freigibst?</p>
+              <div class="inline">
+                <select id="og30" aria-label="Was passiert mit VLAN 30?">
+                  <option value="">bitte wählen</option>
+                  <option value="durch">Die Gäste erreichen das Obergeschoss, weil unser Switch VLAN 30 jetzt überträgt.</option>
+                  <option value="auto">Der Switch im Obergeschoss übernimmt VLAN 30 automatisch.</option>
+                  <option value="schnitt">Für die Gäste ändert sich nichts. Durch die Leitung kommt nur, was beide Seiten erlauben.</option>
+                  <option value="abbruch">Die ganze Verbindung bricht ab, weil die Listen nicht übereinstimmen.</option>
+                </select>
+                <button data-check="9b">Prüfen</button>
+              </div>
+              <div class="fb" id="fb9b"></div>
+              <div class="reveal" id="rev9"></div>
+            </div>
+          </div>
+        </li>
+
+        <li>
+          <div>
+            <h3>Der Empfang</h3>
+            <p>An Port 10 hängt ein einfacher Switch ohne Verwaltung. Die drei Geräte am Empfang sollen ins Büro-VLAN. Richte das ein und prüfe es mit einem Test. Stelle Port 10 anschließend versuchsweise auf Trunk und teste erneut. Was passiert und warum?</p>
+            <button data-check="10">Prüfen</button>
+            <div class="fb" id="fb10"></div>
+            <div class="reveal" id="rev10"></div>
+          </div>
+        </li>
+
+        <li>
+          <div>
+            <h3>Nur bestimmte VLANs in andere Räume</h3>
+            <p>An Port 11 hängt der verwaltete Switch im Schulungsraum, an Port 12 der verwaltete Switch in der Lagerhalle. Ein Trunk überträgt zunächst alle VLANs. Das ist nicht gewollt: In jeden Raum sollen nur die VLANs gelangen, die dort auch gebraucht werden.</p>
+            <table class="grid">
+              <tr><th>Raum</th><th>Port</th><th>Wer arbeitet dort?</th></tr>
+              <tr><td>Schulungsraum</td><td>11</td><td>Büro und Gäste</td></tr>
+              <tr><td>Lagerhalle</td><td>12</td><td>Werkstatt und Gäste</td></tr>
+            </table>
+            <p>In beiden Räumen ist noch eine alte Netzwerkdose eines Bereichs aktiv, der dort nichts zu suchen hat. Richte beide Ports so ein, dass nur die benötigten VLANs übertragen werden. Weise für jeden Raum mit Pings nach, dass der richtige Bereich ankommt und der gesperrte Bereich nicht.</p>
+            <button data-check="11">Prüfen</button>
+            <div class="fb" id="fb11"></div>
+            <div class="reveal" id="rev11"></div>
           </div>
         </li>
 
@@ -571,7 +627,8 @@
     {id:60, name:"VLAN 60",           color:"var(--v60)"},
     {id:70, name:"VLAN 70",           color:"var(--v70)"}
   ];
-  var TRUNK = {id:"trunk", name:"Trunk (alle VLANs)", color:"var(--vtrunk)"};
+  var TRUNK = {id:"trunk", name:"Trunk", color:"var(--vtrunk)"};
+  var TAGGABLE = [10,20,30,40,50,60,70];
 
   var LOCAL = [
     {port:1, name:"PC Buchhaltung",    ip:"192.168.1.11", mac:"3C:97:0E:A1:44:2B", ping:true},
@@ -584,10 +641,23 @@
     {port:8, name:"Server",            ip:"192.168.1.18", mac:"B8:2A:72:04:C1:6D", ping:true}
   ];
 
+  var ROOMS = {9:"im Nachbarraum", 11:"im Schulungsraum", 12:"in der Lagerhalle", 14:"im Obergeschoss"};
+  /* Uplinks, deren Gegenseite bereits ein Trunk ist: dort laufen nur diese VLANs, getaggt */
+  var FAR_TRUNK = {14:[10,20]};
+
   var REMOTE = [
-    {name:"PC Büro 2",      ip:"192.168.1.21", mac:"A0:36:9F:11:04:C8", vlan:10},
-    {name:"PC Werkstatt 2", ip:"192.168.1.22", mac:"A0:36:9F:11:07:35", vlan:20},
-    {name:"Laptop Gast 2",  ip:"192.168.1.23", mac:"6C:3B:6B:22:9A:41", vlan:30}
+    {port:9,  name:"PC Büro 2",              ip:"192.168.1.21", mac:"A0:36:9F:11:04:C8", vlan:10},
+    {port:9,  name:"PC Werkstatt 2",         ip:"192.168.1.22", mac:"A0:36:9F:11:07:35", vlan:20},
+    {port:9,  name:"Laptop Gast 2",          ip:"192.168.1.23", mac:"6C:3B:6B:22:9A:41", vlan:30},
+    {port:11, name:"PC Schulung",            ip:"192.168.1.41", mac:"A0:36:9F:11:12:5A", vlan:10},
+    {port:11, name:"Laptop Gast Schulung",   ip:"192.168.1.42", mac:"6C:3B:6B:22:A0:17", vlan:30},
+    {port:11, name:"PC Werkstatt Schulung",  ip:"192.168.1.43", mac:"A0:36:9F:11:15:E3", vlan:20},
+    {port:12, name:"Scanner Lager",          ip:"192.168.1.51", mac:"00:1B:2F:6D:40:88", vlan:20},
+    {port:12, name:"Access Point Lager",     ip:"192.168.1.52", mac:"F4:92:BF:3A:07:C2", vlan:30},
+    {port:12, name:"PC Büro Lager",          ip:"192.168.1.53", mac:"A0:36:9F:11:19:2D", vlan:10},
+    {port:14, name:"PC Büro OG",             ip:"192.168.1.61", mac:"A0:36:9F:11:22:B6", vlan:10},
+    {port:14, name:"PC Werkstatt OG",        ip:"192.168.1.62", mac:"A0:36:9F:11:24:71", vlan:20},
+    {port:14, name:"Laptop Gast OG",         ip:"192.168.1.63", mac:"6C:3B:6B:22:A7:5E", vlan:30}
   ];
 
   var DUMB = [
@@ -598,10 +668,11 @@
 
   var PORTS = [];
   for(var pi=1; pi<=16; pi++){ PORTS.push(pi); }
-  var FREE = [11,12,13,14,15,16];
+  var FREE = [13,15,16];
 
   var state = {};
-  PORTS.forEach(function(p){ state[p] = 1; });
+  var allowed = {};
+  PORTS.forEach(function(p){ state[p] = 1; allowed[p] = TAGGABLE.slice(); });
 
   var log = [];
   var guess = null;
@@ -668,20 +739,35 @@
     for(var i=0;i<LOCAL.length;i++){ if(LOCAL[i].port===p) return LOCAL[i]; }
     return null;
   }
+  function remoteAt(port){
+    return REMOTE.filter(function(d){ return d.port === port; });
+  }
   function macsOf(port){
     if(port <= 8) return [localByPort(port).mac];
-    if(port === 9) return REMOTE.map(function(d){ return d.mac; });
     if(port === 10) return DUMB.map(function(d){ return d.mac; });
-    return [];
+    return remoteAt(port).map(function(d){ return d.mac; });
+  }
+  function carries(port, v){
+    return state[port] === "trunk" && allowed[port].indexOf(v) > -1;
+  }
+  function allowedText(port){
+    return allowed[port].length ? "VLAN " + allowed[port].join(", ") : "kein VLAN freigegeben";
+  }
+  function portLabel(port){
+    return state[port] === "trunk" ? "Trunk (" + allowedText(port) + ")" : "VLAN " + state[port];
   }
   function vlanLabel(v){ return v === "trunk" ? "Trunk" : "VLAN " + v; }
+  function cfgOf(port){ return String(state[port]) + "|" + allowed[port].join(","); }
+  function sameSet(a, b){
+    return a.length === b.length && b.every(function(v){ return a.indexOf(v) > -1; });
+  }
 
   function findTarget(ip){
     for(var i=0;i<LOCAL.length;i++){
       if(LOCAL[i].ip === ip) return {kind:"local", port:LOCAL[i].port, dev:LOCAL[i]};
     }
     for(var j=0;j<REMOTE.length;j++){
-      if(REMOTE[j].ip === ip) return {kind:"remote", port:9, dev:REMOTE[j]};
+      if(REMOTE[j].ip === ip) return {kind:"remote", port:REMOTE[j].port, dev:REMOTE[j]};
     }
     for(var k=0;k<DUMB.length;k++){
       if(DUMB[k].ip === ip) return {kind:"dumb", port:10, dev:DUMB[k]};
@@ -694,9 +780,14 @@
     if(sv === "trunk") return false;
     if(target.kind === "local"){ return state[target.port] === sv; }
     if(target.kind === "remote"){
-      var m9 = state[9];
-      if(m9 === "trunk") return target.dev.vlan === sv;
-      return m9 === sv && target.dev.vlan === sv;
+      var up = target.port;
+      var far = FAR_TRUNK[up];
+      if(far){
+        /* Gegenseite schickt getaggt: nur ein Trunk versteht das, und nur VLANs, die beide Seiten erlauben */
+        return state[up] === "trunk" && target.dev.vlan === sv && carries(up, sv) && far.indexOf(sv) > -1;
+      }
+      if(state[up] === "trunk") return target.dev.vlan === sv && carries(up, sv);
+      return state[up] === sv && target.dev.vlan === sv;
     }
     var m10 = state[10];
     if(m10 === "trunk") return false;
@@ -715,7 +806,7 @@
       var empty = macs.length === 0;
 
       var card = document.createElement("div");
-      card.className = "port" + (p === 9 || p === 10 ? " uplink" : "") + (empty ? " empty" : "");
+      card.className = "port" + (macs.length > 1 ? " uplink" : "") + (empty ? " empty" : "");
       card.style.setProperty("--vc", empty ? "var(--off)" : colorOf(state[p]));
 
       var num = document.createElement("div");
@@ -754,6 +845,7 @@
       }
 
       var sel = document.createElement("select");
+      sel.id = "port-" + p;
       sel.setAttribute("aria-label", "VLAN für Port " + p);
       VLANS.concat([TRUNK]).forEach(function(v){
         var o = document.createElement("option");
@@ -765,17 +857,73 @@
       sel.addEventListener("change", function(){
         var val = sel.value === "trunk" ? "trunk" : parseInt(sel.value, 10);
         state[p] = val;
+        /* nur bei echter Bedienung, nicht beim Wiederherstellen aus dem Speicher */
+        if(pageReady && val !== 1) maybeOrderHint();
         if(p === 10 && val === "trunk") trunkTried10 = true;
         if(!empty) card.style.setProperty("--vc", colorOf(val));
+        box.classList.toggle("hidden", val !== "trunk");
         paintLeds();
         renderGroups();
         clearFeedback();
       });
 
+      /* Liste der VLANs, die ein Trunk übertragen darf */
+      var box = document.createElement("div");
+      box.className = "allowed" + (state[p] === "trunk" ? "" : " hidden");
+      var head = document.createElement("div");
+      head.className = "al-head";
+      head.textContent = "Erlaubte VLANs";
+      var grid = document.createElement("div");
+      grid.className = "al-grid";
+      var store = document.createElement("input");
+      store.type = "text";
+      store.className = "al-store";
+      store.id = "allowed-" + p;
+      store.tabIndex = -1;
+      store.setAttribute("aria-hidden", "true");
+      store.value = allowed[p].length ? allowed[p].join(",") : "-";
+      var boxes = [];
+      TAGGABLE.forEach(function(v){
+        var lab = document.createElement("label");
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.className = "al-cb";
+        cb.value = v;
+        cb.checked = allowed[p].indexOf(v) > -1;
+        cb.setAttribute("aria-label", "VLAN " + v + " an Port " + p + " erlauben");
+        var sw = document.createElement("span");
+        sw.className = "sw";
+        sw.style.background = colorOf(v);
+        lab.appendChild(cb);
+        lab.appendChild(sw);
+        lab.appendChild(document.createTextNode(v));
+        grid.appendChild(lab);
+        boxes.push(cb);
+        cb.addEventListener("change", function(){
+          allowed[p] = boxes.filter(function(b){ return b.checked; })
+                            .map(function(b){ return parseInt(b.value, 10); });
+          store.value = allowed[p].length ? allowed[p].join(",") : "-";
+          renderGroups();
+          clearFeedback();
+        });
+      });
+      /* Wiederherstellen aus dem Speicher */
+      store.addEventListener("input", function(){
+        var raw = store.value.trim();
+        allowed[p] = raw === "-" || raw === "" ? [] : raw.split(",").map(function(x){ return parseInt(x, 10); })
+                       .filter(function(x){ return TAGGABLE.indexOf(x) > -1; });
+        boxes.forEach(function(b){ b.checked = allowed[p].indexOf(parseInt(b.value, 10)) > -1; });
+        renderGroups();
+      });
+      box.appendChild(head);
+      box.appendChild(grid);
+      box.appendChild(store);
+
       card.appendChild(num);
       card.appendChild(st);
       card.appendChild(macBox);
       card.appendChild(sel);
+      card.appendChild(box);
       elPorts.appendChild(card);
 
       var led = document.createElement("div");
@@ -793,6 +941,33 @@
       if(!dots[i]) return;
       dots[i].style.background = macsOf(p).length === 0 ? "#4b5459" : colorOf(state[p]);
     });
+  }
+
+  /* ================= Hinweis zur Reihenfolge ================= */
+  /* gilt nur bis zum Neuladen der Seite */
+  var hintOk = false;
+  /* erst nach dem Laden scharf schalten, das Wiederherstellen aus dem Speicher löst sonst auch change aus */
+  var pageReady = false;
+  window.addEventListener("load", function(){ setTimeout(function(){ pageReady = true; }, 0); });
+
+  function openEarlyTasks(){
+    var offen = [];
+    if(!done["1"]) offen.push("1");
+    if(!$("done2").checked) offen.push("2");
+    if(!done["3"]) offen.push("3");
+    return offen;
+  }
+  function maybeOrderHint(){
+    if(hintOk) return;
+    var offen = openEarlyTasks();
+    if(!offen.length) return;
+    var welche = (offen.length === 1 ? "Aufgabe " : "die Aufgaben ")
+      + offen.join(offen.length === 2 ? " und " : ", ").replace(/, (\d)$/, " und $1");
+    /* einmal bestätigen, danach nicht mehr nachfragen; die Umstellung bleibt bestehen */
+    hintOk = true;
+    window.alert("Hinweis: Du stellst schon VLANs um, hast aber " + welche + " noch nicht erledigt.\n\n"
+      + "Die Aufgaben bauen aufeinander auf. Es ist klug, sie der Reihe nach zu bearbeiten.\n\n"
+      + "Für Aufgabe 3 müssen alle Ports auf VLAN 1 stehen. Dafür gibt es den Button „Alle Ports auf VLAN 1“.");
   }
 
   /* ================= Terminal ================= */
@@ -912,7 +1087,8 @@
       return;
     }
 
-    log.push({a:srcPort, b:target.port, kind:target.kind, ip:ip, reachable:reachable});
+    log.push({a:srcPort, b:target.port, kind:target.kind, ip:ip, reachable:reachable,
+              cfg:cfgOf(target.port), src:state[srcPort]});
 
     var hit = (guess === reachable);
     var lage;
@@ -921,11 +1097,11 @@
            + " (" + vlanLabel(state[target.port]) + ") "
            + (reachable ? "liegen im selben VLAN." : "liegen in verschiedenen VLANs.");
     }else if(target.kind === "remote"){
-      lage = "Das Ziel steht am Switch im Nachbarraum in VLAN " + target.dev.vlan
-           + ". Port 9 ist auf " + vlanLabel(state[9]) + " eingestellt.";
+      lage = "Das Ziel steht am Switch " + ROOMS[target.port] + " in VLAN " + target.dev.vlan
+           + ". Port " + target.port + " ist auf " + portLabel(target.port) + " eingestellt.";
     }else{
       lage = "Das Ziel hängt am Switch ohne Verwaltung an Port 10. Dieser Port ist auf "
-           + vlanLabel(state[10]) + " eingestellt.";
+           + portLabel(10) + " eingestellt.";
     }
 
     elVerdict.className = "verdict show " + (hit ? "right" : "wrong");
@@ -949,7 +1125,7 @@
     var map = {}, trunks = [];
     PORTS.forEach(function(p){
       if(macsOf(p).length === 0) return;
-      if(state[p] === "trunk"){ trunks.push("Port " + p); return; }
+      if(state[p] === "trunk"){ trunks.push("Port " + p + " (" + allowedText(p) + ")"); return; }
       var v = state[p];
       if(!map[v]) map[v] = [];
       map[v].push("Port " + p);
@@ -972,10 +1148,11 @@
     var el = $("fb" + id);
     el.className = "fb show " + (ok ? "ok" : "no");
     el.textContent = msg;
-    if(ok && String(id) !== "7"){ markDone(String(id) === "7b" ? "7" : String(id)); }
+    /* Aufgaben mit Nachfrage gelten erst nach der Nachfrage (7b, 9b) als erledigt */
+    if(ok && String(id) !== "7" && String(id) !== "9"){ markDone(String(id).replace(/b$/, "")); }
   }
   function clearFeedback(){
-    ["fb3","fb4","fb5","fb6","fb7","fb8","fb9"].forEach(function(id){ $(id).className = "fb"; });
+    ["fb3","fb4","fb5","fb6","fb7","fb8","fb9","fb10","fb11"].forEach(function(id){ $(id).className = "fb"; });
   }
 
   document.querySelectorAll("[data-check]").forEach(function(btn){
@@ -1024,8 +1201,13 @@
           return p !== 7 && macsOf(p).length > 0 && state[p] === g;
         });
         if(mitbewohner){ say(5,false,"Im VLAN des Gast-Laptops hängt noch mindestens ein weiterer belegter Port."); return; }
-        var leaked = (state[9] === "trunk") && REMOTE.some(function(d){ return d.vlan === g; });
-        if(leaked){ say(5,false,"Über den Trunk an Port 9 erreicht der Gast noch ein Gerät im Nachbarraum. Wähle für ihn ein VLAN, das dort nicht vergeben ist."); return; }
+        var leak = null;
+        REMOTE.some(function(d){
+          var farOk = !FAR_TRUNK[d.port] || FAR_TRUNK[d.port].indexOf(g) > -1;
+          if(d.vlan === g && carries(d.port, g) && farOk){ leak = d; return true; }
+          return false;
+        });
+        if(leak){ say(5,false,"Über den Trunk an Port " + leak.port + " erreicht der Gast noch ein Gerät " + ROOMS[leak.port] + ". Wähle für ihn ein VLAN, das dort nicht übertragen wird."); return; }
         var t7 = 0;
         log.forEach(function(t){ if(t.a === 7 && !t.reachable) t7++; });
         if(t7 < 2){ say(5,false,"Bisher " + t7 + " von 2 Tests vom Gast-Laptop aus."); return; }
@@ -1037,6 +1219,12 @@
         var mitBuero = [1,2,3].some(function(p){ return state[p] === s; });
         var mitWerk  = [4,5,6].some(function(p){ return state[p] === s; });
         var rev6 = $("rev6");
+        if(s === "trunk"){
+          say(6,false,"Ein Trunk-Port gehört nicht an ein Endgerät. Der Server ist so von niemandem mehr erreichbar.");
+          rev6.className = "reveal show";
+          rev6.textContent = "Ein Trunk verbindet zwei Switches miteinander. Er endet immer an einem anderen Trunk-Port, nie an einem Endgerät. Über den Trunk kommen Pakete mit VLAN-Tag an. Eine gewöhnliche Netzwerkkarte kann mit diesem Tag nichts anfangen und verwirft die Pakete. An Endgeräte gehört deshalb immer ein Access-Port mit genau einem VLAN. Stelle Port 8 wieder auf ein einzelnes VLAN und überlege weiter.";
+          return;
+        }
         if(mitBuero && mitWerk){
           say(6,false,"Büro und Werkstatt liegen offenbar noch im selben VLAN. Trenne sie zuerst wie in Aufgabe 4.");
           rev6.className = "reveal";
@@ -1086,6 +1274,8 @@
           rev8.className = "reveal";
           return;
         }
+        var fehlt9 = [10,20,30].filter(function(v){ return !carries(9, v); });
+        if(fehlt9.length){ say(8,false,"Port 9 überträgt VLAN " + fehlt9.join(" und VLAN ") + " noch nicht. Im Nachbarraum werden Büro, Werkstatt und Gäste gebraucht."); return; }
         var nochBelegt = FREE.some(function(p){ return state[p] !== 1; });
         if(nochBelegt){ say(8,false,"Die drei Ports aus der vorherigen Aufgabe stehen noch auf einem VLAN. Stelle sie zurück auf VLAN 1."); return; }
         if(!(state[1]===10 && state[2]===10 && state[3]===10)){ say(8,false,"Die Büroports müssen auf VLAN 10 stehen, damit sie zum Nachbarraum passen."); return; }
@@ -1100,27 +1290,98 @@
       }
 
       if(n === "9"){
-        var rev9 = $("rev9");
-        if(state[10] === "trunk"){
-          say(9,false,"Mit Trunk erreicht am Empfang niemand mehr etwas. Stelle Port 10 wieder auf ein einzelnes VLAN.");
-          rev9.className = "reveal show";
-          rev9.textContent = "Ein Switch ohne Verwaltung kennt keine VLANs. Er kann die Kennung im Paket weder lesen noch entfernen. Die Endgeräte dahinter bekommen dann Pakete, mit denen sie nichts anfangen können. Deshalb gehört an einen solchen Switch immer ein normaler Access-Port. Alle Geräte dahinter liegen damit zwangsläufig im selben VLAN. Eine Trennung innerhalb dieses Bereichs ist nicht möglich.";
+        if(!(state[1]===10 && state[2]===10 && state[3]===10)){ say(9,false,"Die Büroports müssen auf VLAN 10 stehen."); return; }
+        if(!(state[4]===20 && state[5]===20 && state[6]===20)){ say(9,false,"Die Werkstattports müssen auf VLAN 20 stehen."); return; }
+        var accessTest = tested(function(t){
+          var mode = t.cfg.split("|")[0];
+          return t.ip === "192.168.1.61" && t.src === 10 && mode === "10";
+        });
+        if(!accessTest){ say(9,false,"Stelle Port 14 zuerst als Access-Port auf VLAN 10 und teste vom Büro aus 192.168.1.61."); return; }
+        if(state[14] !== "trunk"){
+          say(9,false,"Als Access-Port erreicht das Büro das Obergeschoss nicht. Von dort kommen Pakete mit VLAN-Tag an. Welche Porteinstellung versteht diese Pakete?");
           return;
         }
-        if(state[10] !== 10){ say(9,false,"Port 10 muss auf VLAN 10 stehen, damit der Empfang zum Büro gehört."); return; }
-        var ok10 = tested(function(t){ return t.kind==="dumb" && t.reachable; });
-        if(!ok10){ say(9,false,"Teste noch eine Verbindung vom Büro zu einem Gerät am Empfang."); return; }
-        if(!trunkTried10){ say(9,false,"Stelle Port 10 einmal versuchsweise auf Trunk und prüfe erneut."); return; }
-        say(9,true,"Richtig eingerichtet. Am Empfang liegen alle drei Geräte gemeinsam im Büro-VLAN.");
+        var fehlt14 = [10,20].filter(function(v){ return !carries(14, v); });
+        if(fehlt14.length){ say(9,false,"Port 14 überträgt VLAN " + fehlt14.join(" und VLAN ") + " noch nicht."); return; }
+        var cur14 = cfgOf(14);
+        var b14 = tested(function(t){ return t.ip === "192.168.1.61" && t.src === 10 && t.reachable && t.cfg === cur14; });
+        var w14 = tested(function(t){ return t.ip === "192.168.1.62" && t.src === 20 && t.reachable && t.cfg === cur14; });
+        if(!b14){ say(9,false,"Teste noch vom Büro aus den PC Büro OG (192.168.1.61)."); return; }
+        if(!w14){ say(9,false,"Teste noch von der Werkstatt aus den PC Werkstatt OG (192.168.1.62)."); return; }
+        say(9,true,"Richtig eingerichtet. Ein Trunk endet immer an einem Trunk.");
+        $("follow9").className = "followup show";
+      }
+
+      if(n === "9b"){
+        var a9 = $("og30").value, rev9 = $("rev9");
+        if(a9 === ""){ say("9b",false,"Wähle eine Antwort aus."); return; }
+        if(a9 !== "schnitt"){
+          say("9b",false,"Das stimmt nicht. Probiere es aus: Gib an Port 14 zusätzlich VLAN 30 frei, stelle Port 7 versuchsweise auf VLAN 30 und teste 192.168.1.63.");
+          rev9.className = "reveal";
+          return;
+        }
+        say("9b",true,"Richtig.");
         rev9.className = "reveal show";
-        rev9.textContent = "Ein Switch ohne Verwaltung kennt keine VLANs. Deshalb gehört an ihn immer ein normaler Access-Port, und alle Geräte dahinter liegen zwangsläufig im selben VLAN. Auch hier hat der Switch mehrere MAC-Adressen an einem Port gelernt, obwohl es sich um einen ganz gewöhnlichen Access-Port handelt.";
+        rev9.textContent = "Ein Trunk endet immer an einem Trunk. Der sendende Switch versieht jedes Paket mit einem VLAN-Tag, der empfangende muss dieses Tag lesen können. Das kann nur ein Trunk-Port. Ein Access-Port erwartet Pakete ohne Tag und verwirft die getaggten. Jeder Switch filtert dabei nur nach seiner eigenen Liste erlaubter VLANs. Nichts wird automatisch angeglichen. Über die Leitung kommt also nur, was beide Seiten erlauben. Gibst du VLAN 30 nur bei uns frei, schickt unser Switch zwar Pakete aus VLAN 30 nach oben, der Switch im Obergeschoss verwirft sie aber. Das erzeugt nur unnötigen Verkehr. Deshalb stellt man die Listen auf beiden Seiten gleich ein, ebenso die VLAN-Nummern.";
+      }
+
+      if(n === "10"){
+        var rev10 = $("rev10");
+        if(state[10] === "trunk"){
+          say(10,false,"Mit Trunk erreicht am Empfang niemand mehr etwas. Stelle Port 10 wieder auf ein einzelnes VLAN.");
+          rev10.className = "reveal show";
+          rev10.textContent = "Ein Switch ohne Verwaltung kennt keine VLANs. Er kann die Kennung im Paket weder lesen noch entfernen. Die Endgeräte dahinter bekommen dann Pakete, mit denen sie nichts anfangen können. Deshalb gehört an einen solchen Switch immer ein normaler Access-Port. Alle Geräte dahinter liegen damit zwangsläufig im selben VLAN. Eine Trennung innerhalb dieses Bereichs ist nicht möglich.";
+          return;
+        }
+        if(state[10] !== 10){ say(10,false,"Port 10 muss auf VLAN 10 stehen, damit der Empfang zum Büro gehört."); return; }
+        var ok10 = tested(function(t){ return t.kind==="dumb" && t.reachable; });
+        if(!ok10){ say(10,false,"Teste noch eine Verbindung vom Büro zu einem Gerät am Empfang."); return; }
+        if(!trunkTried10){ say(10,false,"Stelle Port 10 einmal versuchsweise auf Trunk und prüfe erneut."); return; }
+        say(10,true,"Richtig eingerichtet. Am Empfang liegen alle drei Geräte gemeinsam im Büro-VLAN.");
+        rev10.className = "reveal show";
+        rev10.textContent = "Ein Switch ohne Verwaltung kennt keine VLANs. Deshalb gehört an ihn immer ein normaler Access-Port, und alle Geräte dahinter liegen zwangsläufig im selben VLAN. Auch hier hat der Switch mehrere MAC-Adressen an einem Port gelernt, obwohl es sich um einen ganz gewöhnlichen Access-Port handelt.";
+      }
+
+      if(n === "11"){
+        var rev11 = $("rev11");
+        var raeume = [
+          {port:11, name:"Schulungsraum", soll:[10,30], gesperrt:20},
+          {port:12, name:"Lagerhalle",    soll:[20,30], gesperrt:10}
+        ];
+        if(!(state[1]===10 && state[2]===10 && state[3]===10)){ say(11,false,"Die Büroports müssen auf VLAN 10 stehen."); return; }
+        if(!(state[4]===20 && state[5]===20 && state[6]===20)){ say(11,false,"Die Werkstattports müssen auf VLAN 20 stehen."); return; }
+        for(var ri=0; ri<raeume.length; ri++){
+          var r = raeume[ri];
+          if(state[r.port] !== "trunk"){
+            say(11,false,"Port " + r.port + " (" + r.name + ") überträgt bisher nur ein einziges VLAN. Dort werden aber zwei Bereiche gebraucht.");
+            return;
+          }
+          var zuviel = allowed[r.port].filter(function(v){ return r.soll.indexOf(v) === -1; });
+          var fehlt  = r.soll.filter(function(v){ return allowed[r.port].indexOf(v) === -1; });
+          if(fehlt.length){ say(11,false,"An Port " + r.port + " (" + r.name + ") fehlt noch VLAN " + fehlt.join(" und VLAN ") + "."); return; }
+          if(zuviel.length){ say(11,false,"Port " + r.port + " (" + r.name + ") überträgt noch VLAN " + zuviel.join(", ") + (zuviel.length > 1 ? ". Diese VLANs werden" : ". Dieses VLAN wird") + " dort nicht gebraucht."); return; }
+        }
+        /* Nur Pings zählen, die mit der aktuellen Einstellung des Uplinks gemacht wurden */
+        function pingOk(ip, srcVlan, soll){
+          var dev = findTarget(ip);
+          return tested(function(t){
+            return t.ip === ip && t.src === srcVlan && t.reachable === soll && t.cfg === cfgOf(dev.port);
+          });
+        }
+        if(!pingOk("192.168.1.41", 10, true)){  say(11,false,"Weise nach, dass das Büro den PC Schulung erreicht."); return; }
+        if(!pingOk("192.168.1.43", 20, false)){ say(11,false,"Weise nach, dass die Werkstatt den Werkstatt-PC im Schulungsraum nicht mehr erreicht."); return; }
+        if(!pingOk("192.168.1.51", 20, true)){  say(11,false,"Weise nach, dass die Werkstatt den Scanner in der Lagerhalle erreicht."); return; }
+        if(!pingOk("192.168.1.53", 10, false)){ say(11,false,"Weise nach, dass das Büro den Büro-PC in der Lagerhalle nicht mehr erreicht."); return; }
+        say(11,true,"Richtig eingerichtet. Jeder Raum bekommt nur die VLANs, die dort gebraucht werden.");
+        rev11.className = "reveal show";
+        rev11.textContent = "Ein Trunk-Port überträgt ohne weitere Einstellung alle VLANs. Mit der Liste der erlaubten VLANs (bei Cisco: switchport trunk allowed vlan) legt man fest, welche VLANs tatsächlich über die Leitung dürfen. Das hat zwei Vorteile. Erstens die Sicherheit: Eine falsch eingerichtete oder vergessene Netzwerkdose im Raum hängt zwar noch in ihrem VLAN, bekommt aber keine Verbindung zum Rest dieses VLANs. Zweitens weniger Last: Broadcasts eines VLANs werden nicht mehr in Räume geschickt, in denen niemand aus diesem VLAN arbeitet.";
       }
     });
   });
 
   /* ================= Zurücksetzen ================= */
-  $("reset").addEventListener("click", function(){
-    PORTS.forEach(function(p){ state[p] = 1; });
+  function resetAll(){
+    PORTS.forEach(function(p){ state[p] = 1; allowed[p] = TAGGABLE.slice(); });
     log = [];
     trunkTried10 = false;
     setGuess(null);
@@ -1128,15 +1389,19 @@
     buildPorts();
     renderGroups();
     clearFeedback();
-    ["rev6","rev8","rev9"].forEach(function(id){ $(id).className = "reveal"; });
+    ["rev6","rev8","rev9","rev10","rev11"].forEach(function(id){ $(id).className = "reveal"; });
     elVerdict.className = "verdict";
     elTerm.className = "term";
     elTerm.textContent = "Alle Ports stehen wieder auf VLAN 1. Die Testergebnisse wurden gelöscht.";
     updateSend();
-  });
+    /* gespeicherte Porteinstellungen angleichen, sonst kommen sie beim Neuladen zurück */
+    document.dispatchEvent(new Event("change"));
+  }
+  $("reset").addEventListener("click", resetAll);
+  $("resetTop").addEventListener("click", resetAll);
 
   /* ================= Checkliste ================= */
-  var DONE_PREFIX = "bsfi-vlan:done:";
+  var DONE_PREFIX = "bsfi-vlan2:done:";
   var done = {};
   var clItems = [];
 
@@ -1209,7 +1474,7 @@
       var tr = document.createElement("tr");
       [ "Port " + p,
         macs.length ? macs.join(", ") : "nicht verbunden",
-        state[p] === "trunk" ? "Trunk (alle VLANs)" : "VLAN " + state[p]
+        portLabel(p)
       ].forEach(function(txt, i){
         var td = document.createElement("td");
         td.textContent = txt;
@@ -1262,8 +1527,8 @@
 <div class="vt-tools"><button type="button" class="js-print">PDF speichern</button> <button type="button" id="vt-wipe">Alle Eingaben löschen</button></div>
 <script>
 (function(){
-  var PREFIX = 'bsfi-vlan:';
-  var EXCLUDE = '#url, #user, #pass, #cmd, #src';
+  var PREFIX = 'bsfi-vlan2:';
+  var EXCLUDE = '#url, #user, #pass, #cmd, #src, .al-cb';
   var TOGGLES = '';
   var WIPE_ID = '';
   var store = null;
